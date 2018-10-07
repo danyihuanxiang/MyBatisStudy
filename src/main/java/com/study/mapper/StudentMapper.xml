@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.mapper.StudentMapper">
+    <resultMap id="BaseResultMap" type="com.study.domain.Student">
+        <constructor>
+            <idArg column="StudentId" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="StudentName" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="SchoolIds" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="BaseResultMap2" type="com.study.domain.Student">
+        <constructor>
+            <idArg column="StudentId" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <arg column="StudentName" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <arg column="SchoolIds" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+        </constructor>
+        <association property="school" javaType="com.study.domain.School">
+            <id property="schoolid" column="SchoolId" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+            <result property="schoolname" column="SchoolName" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <result property="studentids" column="StudentIds" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+        </association>
+    </resultMap>
+
+     <select id="selectFindList" resultMap="BaseResultMap2" parameterType="int">
+        select *  from Student s
+        join School sl  on s.schoolids=sl.schoolid
+         where s.StudentId=#{studentid,jdbcType=INTEGER};
+    </select>
+
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    StudentId, StudentName, SchoolIds
+  </sql>
+    <select id="selectByExample" parameterType="com.study.domain.StudentExample" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from Student
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from Student
+        where StudentId = #{studentid,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from Student
+    where StudentId = #{studentid,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteByExample" parameterType="com.study.domain.StudentExample">
+        delete from Student
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.study.domain.Student">
+    insert into Student (StudentId, StudentName, SchoolIds
+      )
+    values (#{studentid,jdbcType=INTEGER}, #{studentname,jdbcType=VARCHAR}, #{schoolids,jdbcType=INTEGER}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="com.study.domain.Student">
+        insert into Student
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="studentid != null">
+                StudentId,
+            </if>
+            <if test="studentname != null">
+                StudentName,
+            </if>
+            <if test="schoolids != null">
+                SchoolIds,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="studentid != null">
+                #{studentid,jdbcType=INTEGER},
+            </if>
+            <if test="studentname != null">
+                #{studentname,jdbcType=VARCHAR},
+            </if>
+            <if test="schoolids != null">
+                #{schoolids,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.study.domain.StudentExample" resultType="java.lang.Long">
+        select count(*) from Student
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update Student
+        <set>
+            <if test="record.studentid != null">
+                StudentId = #{record.studentid,jdbcType=INTEGER},
+            </if>
+            <if test="record.studentname != null">
+                StudentName = #{record.studentname,jdbcType=VARCHAR},
+            </if>
+            <if test="record.schoolids != null">
+                SchoolIds = #{record.schoolids,jdbcType=INTEGER},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update Student
+        set StudentId = #{record.studentid,jdbcType=INTEGER},
+        StudentName = #{record.studentname,jdbcType=VARCHAR},
+        SchoolIds = #{record.schoolids,jdbcType=INTEGER}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.study.domain.Student">
+        update Student
+        <set>
+            <if test="studentname != null">
+                StudentName = #{studentname,jdbcType=VARCHAR},
+            </if>
+            <if test="schoolids != null">
+                SchoolIds = #{schoolids,jdbcType=INTEGER},
+            </if>
+        </set>
+        where StudentId = #{studentid,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.study.domain.Student">
+    update Student
+    set StudentName = #{studentname,jdbcType=VARCHAR},
+      SchoolIds = #{schoolids,jdbcType=INTEGER}
+    where StudentId = #{studentid,jdbcType=INTEGER}
+  </update>
+</mapper>
